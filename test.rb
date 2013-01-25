@@ -33,28 +33,38 @@ scheduler.every '10s' do
 			subdoc = Nokogiri::HTML(open(sublink))
 				img_source = subdoc.css("meta[@property='og:image']/@content").to_s.gsub("_5", "_7")
 				#loaded URLs
-				#url_list << img_source.split('\n')
-				url_list << img_source
+				url_list << img_source.to_s
+				url_list << "\n"
+				#url_list << img_source
 		end
 	end
+	puts "url_list: #{url_list}"
 	#3. read from cvs file
 	tmp_list = []
+	tmp_database = []
+
+	# 4 read all the cvs to an array
+	# go through url links each and check if its in cvs
 	CSV.foreach('database.csv') do |row|
-  		#4. compare, look for and store new entity
-  		puts row
-  		if not url_list.include?(row)
-  			tmp_list << row
-  			puts "new entity: "
-  			puts row
-  		end
+		tmp_database << row
+		tmp_database << "\n"
+	end
+	puts "tmp_database : #{tmp_database}"
+	
+	url_list.each do |uri|
+		unless tmp_database.include?(uri)
+			tmp_list << uri
+			puts "uri added: #{uri}"
+		end
 	end
 
 	#5. write new entity for cvs
-	if not tmp_list.empty?
-		puts "now: #{tmp_list}" 
+	unless tmp_list.empty?
+		puts "tmp_list: #{tmp_list}" 
 		CSV.open('database.csv', 'wb') do |csv|
 			tmp_list.each do |el| 
-				csv << el
+				puts "writing row: #{el}"
+				csv << [el.to_s]
 			end
 			# csv << tmp_list.split("\n")
 		end
