@@ -1,4 +1,4 @@
-bosco_instagram
+instagram_puller
 ===============
 pulls images from statigr.am/....
 every 10s
